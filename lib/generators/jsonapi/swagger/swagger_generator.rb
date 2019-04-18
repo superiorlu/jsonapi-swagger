@@ -1,48 +1,68 @@
-# frozen_string_literal: true
-
 module Jsonapi
-  class SwaggerGenerator < ::Rails::Generators::NamedBase
+  class SwaggerGenerator < Rails::Generators::NamedBase
+    desc 'Create a JSONAPI Swagger.'
     source_root File.expand_path('templates', __dir__)
 
-    def copy_serializable_file
-      template 'swagger.rb.erb',
-               File.join('spec/requests', class_path,
-                         "#{spec_file_name}.rb")
+    def create_swagger_file
+      swagger_file = File.join(
+        'spec/requests',
+        class_path,
+        spec_file_name
+      )
+      template 'swagger.rb.erb', swagger_file
     end
 
     private
 
     def spec_file_name
-      "#{file_name}_spec.rb"
+      "#{file_name.downcase.pluralize}_spec.rb"
     end
 
-    def serializable_class_name
-      (class_path + [serializable_file_name]).map!(&:camelize).join('::')
+    def resouces_name
+      model_class_name.pluralize
+    end
+
+    def route_resouces
+      resouces_name.downcase.gsub('::', '/')
+    end
+
+    def model_class_name
+      (class_path + [file_name]).map!(&:camelize).join("::")
     end
 
     def model_klass
-      # TODO(beauby): Ensure the model class exists.
-      class_name.safe_constantize
+      model_class_name.safe_constantize
     end
 
-    def type
-      model_klass.model_name.plural
+    def resource_klass
+      "#{model_class_name}Resource".safe_constantize
     end
 
-    def attr_names
-      attrs = model_klass.new.attribute_names - ['id']
-      fk_attrs = model_klass.reflect_on_all_associations(:belongs_to)
-                            .map(&:foreign_key)
-      attrs - fk_attrs
+    def attributes
+      resource_klass._attributes.except(:id)
     end
 
-    def has_one_rel_names
-      model_klass.reflect_on_all_associations(:has_one).map(&:name) +
-        model_klass.reflect_on_all_associations(:belongs_to).map(&:name)
+    def relationships
+      resource_klass._relationships
     end
 
-    def has_many_rel_names
-      model_klass.reflect_on_all_associations(:has_many).map(&:name)
+    def columns_with_comment
+      @columns_with_comment ||= {}.tap do |clos|
+        model_klass.columns.each do |col|
+          clos[col.name.to_sym] = { type: swagger_type(col.type), comment: safe_encode(col.comment) }
+        end
+      end
+    end
+
+    def swagger_type(type)
+      case type
+      when :bigint, :integer then 'integer'
+      else 'string'
+      end
+    end
+
+    def safe_encode(comment)
+      comment&.force_encoding('ASCII-8BIT')
     end
   end
 end
