@@ -1,0 +1,150 @@
+require 'swagger_helper'
+RSpec.describe '<%= resouces_name %>', type: :request do
+<% if resource_klass.immutable -%>
+  path '/<%= route_resouces %>' do
+    get '<%= route_resouces %>' do
+      tags '<%= route_resouces %>'
+      produces 'application/vnd.api+json'
+      parameter name: :'page[number]', in: :query, type: :string, description: '页码', required: false
+      parameter name: :include, in: :query, type: :string, description: '包含关联数据', required: false
+<% relationships.keys.each do |relation| -%>
+      parameter name: :'fields[<%= relation %>]', in: :query, type: :string, description: '包含字段', required: false
+<% end -%>
+      response '200', '获取列表' do
+        schema type: :object,
+          properties: {
+            data: {
+              type: :array,
+              items: {
+                type: :object,
+                properties: {
+                  id: { type: :integer, description: 'ID'},
+                  links: {
+                    type: :object,
+                    properties: {
+                    self: { type: :string, description: '详情链接'},
+                    },
+                    description: '详情链接'
+                  },
+                  attributes: {
+                    type: :object,
+                    properties: {
+<% attributes.keys.each do |attr| -%>
+                     <%= attr %>: { type: :<%= columns_with_comment[attr][:type] %>, description: '<%= columns_with_comment[attr][:comment] %>'},
+<% end -%>
+                    },
+                    description: '属性'
+                  },
+                  relationships: {
+                    type: :object,
+                    properties: {
+<% relationships.each do |relation_name, relation| -%>
+<% relation_name_camelize = relation_name.to_s.camelize -%>
+                      <%= relation_name %>: {
+                        type: :object,
+                        properties: {
+                          links: {
+                            type: :object,
+                            properties: {
+                              self: { type: :string, description: '关联<%= relation_name_camelize %>列表链接' },
+                              related: { type: :string, description: '相关<%= relation_name_camelize %>链接' },
+                            },
+                            description: '相关的<%= relation_name_camelize %>链接'
+                          },
+                        },
+                        description: '相关<%= relation_name_camelize %>'
+                      },
+<% end -%>
+                    },
+                    description: '关联数据'
+                  }
+              },
+            },
+            description: '数据'
+            },
+            meta: {
+              type: :object,
+              properties: {
+                record_count: { type: :integer, description: '总记录数'},
+                page_count: { type: :integer, description: '页数'},
+              },
+              description: '分页记录数'
+            },
+            links: { type: :array, items: { type: :string }, description: '分页链接' },
+          },
+          required: [:data]
+        run_test!
+      end
+    end
+  end
+
+  path '/<%= route_resouces %>/{id}' do
+    get '<%= route_resouces %>详情' do
+      tags '<%= route_resouces %>'
+      produces 'application/vnd.api+json'
+      parameter name: :id, in: :path, type: :integer, description: 'ID', required: true
+
+      response '200', '获取详情' do
+        schema type: :object,
+          properties: {
+            data: {
+              type: :array,
+              items: {
+                type: :object,
+                properties: {
+                  id: { type: :integer, description: 'ID'},
+                  links: {
+                    type: :object,
+                    properties: {
+                    self: { type: :string, description: '详情链接'},
+                    },
+                    description: '详情链接'
+                  },
+                  attributes: {
+                    type: :object,
+                    properties: {
+<% attributes.keys.each do |attr| -%>
+                     <%= attr %>: { type: :<%= columns_with_comment[attr][:type] %>, description: '<%= columns_with_comment[attr][:comment] %>'},
+<% end -%>
+                    },
+                    description: '属性'
+                  },
+                  relationships: {
+                    type: :object,
+                    properties: {
+<% relationships.each do |relation_name, relation| -%>
+<% relation_name_camelize = relation_name.to_s.camelize -%>
+                      <%= relation_name %>: {
+                        type: :object,
+                        properties: {
+                          links: {
+                            type: :object,
+                            properties: {
+                              self: { type: :string, description: '关联<%= relation_name_camelize %>列表链接' },
+                              related: { type: :string, description: '相关<%= relation_name_camelize %>链接' },
+                            },
+                            description: '相关的<%= relation_name_camelize %>链接'
+                          },
+                        },
+                        description: '相关<%= relation_name_camelize %>'
+                      },
+<% end -%>
+
+
+
+                    },
+                    description: '关联数据'
+                  }
+              },
+            },
+            description: '数据'
+            },
+          },
+          required: [:data]
+        run_test!
+      end
+    end
+  end
+<% else -%>
+<% end -%>
+end
