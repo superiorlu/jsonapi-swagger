@@ -18,12 +18,16 @@ module Jsonapi
       "#{file_name.downcase.pluralize}_spec.rb"
     end
 
+    def model_name
+      file_name.downcase.singularize
+    end
+
     def resouces_name
       model_class_name.pluralize
     end
 
     def route_resouces
-      resouces_name.downcase.gsub('::', '/')
+      resouces_name.tableize
     end
 
     def model_class_name
@@ -49,14 +53,16 @@ module Jsonapi
     def columns_with_comment
       @columns_with_comment ||= {}.tap do |clos|
         model_klass.columns.each do |col|
-          clos[col.name.to_sym] = { type: swagger_type(col.type), comment: safe_encode(col.comment) }
+          clos[col.name.to_sym] = { type: swagger_type(col), items_type: col.type, is_array: col.array,  nullable: col.null, comment: safe_encode(col.comment) }
         end
       end
     end
 
-    def swagger_type(type)
-      case type
+    def swagger_type(column)
+      return 'array' if column.array
+      case column.type
       when :bigint, :integer then 'integer'
+      when :boolean          then 'boolean'
       else 'string'
       end
     end

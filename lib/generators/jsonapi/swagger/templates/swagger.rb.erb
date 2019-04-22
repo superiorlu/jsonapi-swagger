@@ -1,14 +1,20 @@
 require 'swagger_helper'
 RSpec.describe '<%= resouces_name %>', type: :request do
-<% if resource_klass.immutable -%>
+  let(:include) {''} #see https://github.com/domaindrivendev/rswag/issues/188
+
+  before(:each) do
+    @<%= model_name %> = create :<%= model_name %>
+  end
+
   path '/<%= route_resouces %>' do
     get '<%= route_resouces %>' do
       tags '<%= route_resouces %>'
       produces 'application/vnd.api+json'
       parameter name: :'page[number]', in: :query, type: :string, description: '页码', required: false
       parameter name: :include, in: :query, type: :string, description: '包含关联数据', required: false
-<% relationships.keys.each do |relation| -%>
-      parameter name: :'fields[<%= relation %>]', in: :query, type: :string, description: '包含字段', required: false
+      parameter name: :'fields[<%= route_resouces %>]', in: :query, type: :string, description: '包含字段', required: false
+<% relationships.each_key do |relation| -%>
+      parameter name: :'fields[<%= relation.to_s.pluralize %>]', in: :query, type: :string, description: '包含字段', required: false
 <% end -%>
       response '200', '获取列表' do
         schema type: :object,
@@ -18,7 +24,7 @@ RSpec.describe '<%= resouces_name %>', type: :request do
               items: {
                 type: :object,
                 properties: {
-                  id: { type: :integer, description: 'ID'},
+                  id: { type: :string, description: 'ID'},
                   links: {
                     type: :object,
                     properties: {
@@ -29,8 +35,8 @@ RSpec.describe '<%= resouces_name %>', type: :request do
                   attributes: {
                     type: :object,
                     properties: {
-<% attributes.keys.each do |attr| -%>
-                     <%= attr %>: { type: :<%= columns_with_comment[attr][:type] %>, description: '<%= columns_with_comment[attr][:comment] %>'},
+<% attributes.each_key.each do |attr| -%>
+                     <%= attr %>: { type: :<%= columns_with_comment[attr][:type] %>, <%if columns_with_comment[attr][:is_array] -%> items: { type: :<%= columns_with_comment[attr][:items_type] %>},<% end -%> 'x-nullable': <%= columns_with_comment[attr][:nullable] %>, description: '<%= columns_with_comment[attr][:comment] %>'},
 <% end -%>
                     },
                     description: '属性'
@@ -70,7 +76,14 @@ RSpec.describe '<%= resouces_name %>', type: :request do
               },
               description: '分页记录数'
             },
-            links: { type: :array, items: { type: :string }, description: '分页链接' },
+            links: {
+              type: :object,
+              properties: {
+                first: { type: :string, description: '第一页'},
+                next: { type: :string, description: '下一页'},
+                last: { type: :string, description: '最后一页'},
+              },
+              description: '分页链接' },
           },
           required: [:data]
         run_test!
@@ -83,16 +96,19 @@ RSpec.describe '<%= resouces_name %>', type: :request do
       tags '<%= route_resouces %>'
       produces 'application/vnd.api+json'
       parameter name: :id, in: :path, type: :integer, description: 'ID', required: true
-
+      parameter name: :include, in: :query, type: :string, description: '包含关联数据', required: false
+      parameter name: :'fields[<%= route_resouces %>]', in: :query, type: :string, description: '包含字段', required: false
+<% relationships.each_key do |relation| -%>
+      parameter name: :'fields[<%= relation.to_s.pluralize %>]', in: :query, type: :string, description: '包含字段', required: false
+<% end -%>
       response '200', '获取详情' do
         schema type: :object,
           properties: {
             data: {
-              type: :array,
-              items: {
                 type: :object,
                 properties: {
-                  id: { type: :integer, description: 'ID'},
+                  id: { type: :string, description: 'ID'},
+                  type: { type: :string, description: 'Type'},
                   links: {
                     type: :object,
                     properties: {
@@ -103,8 +119,8 @@ RSpec.describe '<%= resouces_name %>', type: :request do
                   attributes: {
                     type: :object,
                     properties: {
-<% attributes.keys.each do |attr| -%>
-                     <%= attr %>: { type: :<%= columns_with_comment[attr][:type] %>, description: '<%= columns_with_comment[attr][:comment] %>'},
+<% attributes.each_key.each do |attr| -%>
+                     <%= attr %>: { type: :<%= columns_with_comment[attr][:type] %>, <%if columns_with_comment[attr][:is_array] -%> items: { type: :<%= columns_with_comment[attr][:items_type] %>},<% end -%> 'x-nullable': <%= columns_with_comment[attr][:nullable] %>, description: '<%= columns_with_comment[attr][:comment] %>'},
 <% end -%>
                     },
                     description: '属性'
@@ -129,22 +145,19 @@ RSpec.describe '<%= resouces_name %>', type: :request do
                         description: '相关<%= relation_name_camelize %>'
                       },
 <% end -%>
-
-
-
                     },
                     description: '关联数据'
                   }
-              },
             },
             description: '数据'
             },
           },
           required: [:data]
+        let(:id) { @<%= model_name %>.id }
         run_test!
       end
     end
   end
-<% else -%>
+<% unless resource_klass.immutable -%>
 <% end -%>
 end
