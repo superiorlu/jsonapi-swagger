@@ -27,7 +27,9 @@ rails generate jsonapi:swagger User # UserResponse < JSONAPI::Resource
 ```
 
 ## Resource
+
 - [JSONAPI](https://jsonapi.org/)
+- [JSONAPI::Resources](http://jsonapi-resources.com/)
 - [Rswag](https://github.com/domaindrivendev/rswag)
 
 ## Contributing
