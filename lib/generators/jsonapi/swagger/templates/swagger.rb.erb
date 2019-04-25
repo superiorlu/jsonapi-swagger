@@ -7,16 +7,16 @@ RSpec.describe '<%= resouces_name %>', type: :request do
   end
 
   path '/<%= route_resouces %>' do
-    get '<%= route_resouces %>' do
+    get '<%= route_resouces %> <%= t(:list) %>' do
       tags '<%= route_resouces %>'
       produces 'application/vnd.api+json'
-      parameter name: :'page[number]', in: :query, type: :string, description: '页码', required: false
-      parameter name: :include, in: :query, type: :string, description: '包含关联数据', required: false
-      parameter name: :'fields[<%= route_resouces %>]', in: :query, type: :string, description: '包含字段', required: false
+      parameter name: :'page[number]', in: :query, type: :string, description: '<%= t(:page_num) %>', required: false
+      parameter name: :include, in: :query, type: :string, description: '<%= t(:include_related_data) %>', required: false
+      parameter name: :'fields[<%= route_resouces %>]', in: :query, type: :string, description: '<%= t(:display_field) %>', required: false
 <% relationships.each_key do |relation| -%>
-      parameter name: :'fields[<%= relation.to_s.pluralize %>]', in: :query, type: :string, description: '包含字段', required: false
+      parameter name: :'fields[<%= relation.to_s.pluralize %>]', in: :query, type: :string, description: '<%= t(:display_field) %>', required: false
 <% end -%>
-      response '200', '获取列表' do
+      response '200', '<%= t(:get_list) %>' do
         schema type: :object,
           properties: {
             data: {
@@ -28,9 +28,9 @@ RSpec.describe '<%= resouces_name %>', type: :request do
                   links: {
                     type: :object,
                     properties: {
-                    self: { type: :string, description: '详情链接'},
+                    self: { type: :string, description: '<%= t(:detail_link) %>'},
                     },
-                    description: '详情链接'
+                    description: '<%= t(:detail_link) %>'
                   },
                   attributes: {
                     type: :object,
@@ -39,7 +39,7 @@ RSpec.describe '<%= resouces_name %>', type: :request do
                      <%= attr %>: { type: :<%= columns_with_comment[attr][:type] %>, <%if columns_with_comment[attr][:is_array] -%> items: { type: :<%= columns_with_comment[attr][:items_type] %>},<% end -%> 'x-nullable': <%= columns_with_comment[attr][:nullable] %>, description: '<%= columns_with_comment[attr][:comment] %>'},
 <% end -%>
                     },
-                    description: '属性'
+                    description: '<%= t(:attributes) %>'
                   },
                   relationships: {
                     type: :object,
@@ -52,38 +52,38 @@ RSpec.describe '<%= resouces_name %>', type: :request do
                           links: {
                             type: :object,
                             properties: {
-                              self: { type: :string, description: '关联<%= relation_name_camelize %>列表链接' },
-                              related: { type: :string, description: '相关<%= relation_name_camelize %>链接' },
+                              self: { type: :string, description: '<%= t(:associate_list_link, model: relation_name_camelize) %>' },
+                              related: { type: :string, description: '<%= t(:related_link, model: relation_name_camelize) %>' },
                             },
-                            description: '相关的<%= relation_name_camelize %>链接'
+                            description: '<%= t(:related_link, model: relation_name_camelize)%>'
                           },
                         },
-                        description: '相关<%= relation_name_camelize %>'
+                        description: '<%= t(:related_model, model: relation_name_camelize)%>'
                       },
 <% end -%>
                     },
-                    description: '关联数据'
+                    description: '<%= t(:associate_data) %>'
                   }
               },
             },
-            description: '数据'
+            description: '<%= t(:data) %>'
             },
             meta: {
               type: :object,
               properties: {
-                record_count: { type: :integer, description: '总记录数'},
-                page_count: { type: :integer, description: '页数'},
+                record_count: { type: :integer, description: '<%= t(:record_count) %>'},
+                page_count: { type: :integer, description: '<%= t(:page_count) %>'},
               },
-              description: '分页记录数'
+              description: '<%= t(:meta) %>'
             },
             links: {
               type: :object,
               properties: {
-                first: { type: :string, description: '第一页'},
-                next: { type: :string, description: '下一页'},
-                last: { type: :string, description: '最后一页'},
+                first: { type: :string, description: '<%= t(:first_page_link) %>'},
+                next: { type: :string, description: '<%= t(:next_page_link) %>'},
+                last: { type: :string, description: '<%= t(:last_page_link) %>'},
               },
-              description: '分页链接' },
+              description: '<%= t(:page_links) %>' },
           },
           required: [:data]
         run_test!
@@ -92,16 +92,16 @@ RSpec.describe '<%= resouces_name %>', type: :request do
   end
 
   path '/<%= route_resouces %>/{id}' do
-    get '<%= route_resouces %>详情' do
+    get '<%= route_resouces %> <%= t(:detail) %>' do
       tags '<%= route_resouces %>'
       produces 'application/vnd.api+json'
       parameter name: :id, in: :path, type: :integer, description: 'ID', required: true
-      parameter name: :include, in: :query, type: :string, description: '包含关联数据', required: false
-      parameter name: :'fields[<%= route_resouces %>]', in: :query, type: :string, description: '包含字段', required: false
+      parameter name: :include, in: :query, type: :string, description: '<%= t(:include_related_data) %>', required: false
+      parameter name: :'fields[<%= route_resouces %>]', in: :query, type: :string, description: '<%= t(:display_field) %>', required: false
 <% relationships.each_key do |relation| -%>
-      parameter name: :'fields[<%= relation.to_s.pluralize %>]', in: :query, type: :string, description: '包含字段', required: false
+      parameter name: :'fields[<%= relation.to_s.pluralize %>]', in: :query, type: :string, description: '<%= t(:display_field) %>', required: false
 <% end -%>
-      response '200', '获取详情' do
+      response '200', '<%= t(:get_detail) %>' do
         schema type: :object,
           properties: {
             data: {
@@ -112,9 +112,9 @@ RSpec.describe '<%= resouces_name %>', type: :request do
                   links: {
                     type: :object,
                     properties: {
-                    self: { type: :string, description: '详情链接'},
+                    self: { type: :string, description: '<%= t(:detail_link) %>'},
                     },
-                    description: '详情链接'
+                    description: '<%= t(:detail_link) %>'
                   },
                   attributes: {
                     type: :object,
@@ -123,7 +123,7 @@ RSpec.describe '<%= resouces_name %>', type: :request do
                      <%= attr %>: { type: :<%= columns_with_comment[attr][:type] %>, <%if columns_with_comment[attr][:is_array] -%> items: { type: :<%= columns_with_comment[attr][:items_type] %>},<% end -%> 'x-nullable': <%= columns_with_comment[attr][:nullable] %>, description: '<%= columns_with_comment[attr][:comment] %>'},
 <% end -%>
                     },
-                    description: '属性'
+                    description: '<%= t(:attributes) %>'
                   },
                   relationships: {
                     type: :object,
@@ -136,20 +136,20 @@ RSpec.describe '<%= resouces_name %>', type: :request do
                           links: {
                             type: :object,
                             properties: {
-                              self: { type: :string, description: '关联<%= relation_name_camelize %>列表链接' },
-                              related: { type: :string, description: '相关<%= relation_name_camelize %>链接' },
+                              self: { type: :string, description: '<%= t(:associate_list_link, model: relation_name_camelize) %>' },
+                              related: { type: :string, description: '<%= t(:related_link, model: relation_name_camelize )%>' },
                             },
-                            description: '相关的<%= relation_name_camelize %>链接'
+                            description: '<%= t(:related_link, model: relation_name_camelize) %>'
                           },
                         },
-                        description: '相关<%= relation_name_camelize %>'
+                        description: '<%= t(:related_link, model: relation_name_camelize) %>'
                       },
 <% end -%>
                     },
-                    description: '关联数据'
+                    description: '<%= t(:associate_data) %>'
                   }
             },
-            description: '数据'
+            description: '<%= t(:data) %>'
             },
           },
           required: [:data]

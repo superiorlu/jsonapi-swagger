@@ -67,8 +67,15 @@ module Jsonapi
       end
     end
 
-    def safe_encode(comment)
-      comment&.force_encoding('ASCII-8BIT')
+    def t(key, options={})
+      options[:scope] = :jsonapi_swagger
+      options[:default] = key.to_s.humanize
+      content = I18n.t(key, options)
+      safe_encode(content)
+    end
+
+    def safe_encode(content)
+      content&.force_encoding('ASCII-8BIT')
     end
   end
 end
