@@ -13,8 +13,8 @@ RSpec.describe '<%= resouces_name %>', type: :request do
       parameter name: :'page[number]', in: :query, type: :string, description: '<%= t(:page_num) %>', required: false
       parameter name: :include, in: :query, type: :string, description: '<%= t(:include_related_data) %>', required: false
       parameter name: :'fields[<%= route_resouces %>]', in: :query, type: :string, description: '<%= t(:display_field) %>', required: false
-<% relationships.each_key do |relation| -%>
-      parameter name: :'fields[<%= relation.to_s.pluralize %>]', in: :query, type: :string, description: '<%= t(:display_field) %>', required: false
+<% relationships.each_value do |relation| -%>
+      parameter name: :'fields[<%= relation.class_name.tableize %>]', in: :query, type: :string, description: '<%= t(:display_field) %>', required: false
 <% end -%>
       response '200', '<%= t(:get_list) %>' do
         schema type: :object,
@@ -98,8 +98,8 @@ RSpec.describe '<%= resouces_name %>', type: :request do
       parameter name: :id, in: :path, type: :integer, description: 'ID', required: true
       parameter name: :include, in: :query, type: :string, description: '<%= t(:include_related_data) %>', required: false
       parameter name: :'fields[<%= route_resouces %>]', in: :query, type: :string, description: '<%= t(:display_field) %>', required: false
-<% relationships.each_key do |relation| -%>
-      parameter name: :'fields[<%= relation.to_s.pluralize %>]', in: :query, type: :string, description: '<%= t(:display_field) %>', required: false
+<% relationships.each_value do |relation| -%>
+      parameter name: :'fields[<%= relation.class_name.tableize %>]', in: :query, type: :string, description: '<%= t(:display_field) %>', required: false
 <% end -%>
       response '200', '<%= t(:get_detail) %>' do
         schema type: :object,
