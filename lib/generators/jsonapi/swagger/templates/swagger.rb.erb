@@ -12,6 +12,9 @@ RSpec.describe '<%= resouces_name %>', type: :request do
       produces 'application/vnd.api+json'
       parameter name: :'page[number]', in: :query, type: :string, description: '<%= t(:page_num) %>', required: false
       parameter name: :include, in: :query, type: :string, description: '<%= t(:include_related_data) %>', required: false
+<% filters.each do |filter_attr, filter_config| -%>
+      parameter name: :'filter[<%= filter_attr %>]', in: :query, type: :string, description: '<%= t(:filter_field) %>', <% if filter_config[:default] -%>default: '<%= safe_encode(filter_config[:default]) %>',<% end %>required: false
+<% end -%>
       parameter name: :'fields[<%= route_resouces %>]', in: :query, type: :string, description: '<%= t(:display_field) %>', required: false
 <% relationships.each_value do |relation| -%>
       parameter name: :'fields[<%= relation.class_name.tableize %>]', in: :query, type: :string, description: '<%= t(:display_field) %>', required: false
@@ -36,7 +39,7 @@ RSpec.describe '<%= resouces_name %>', type: :request do
                     type: :object,
                     properties: {
 <% attributes.each_key.each do |attr| -%>
-                     <%= attr %>: { type: :<%= columns_with_comment[attr][:type] %>, <%if columns_with_comment[attr][:is_array] -%> items: { type: :<%= columns_with_comment[attr][:items_type] %>},<% end -%> 'x-nullable': <%= columns_with_comment[attr][:nullable] %>, description: '<%= columns_with_comment[attr][:comment] %>'},
+                     <%= attr %>: { type: :<%= columns_with_comment[attr][:type] %>, <%if columns_with_comment[attr][:is_array] -%> items: { type: :<%= columns_with_comment[attr][:items_type] %>},<% end -%>'x-nullable': <%= columns_with_comment[attr][:nullable] %>, description: '<%= columns_with_comment[attr][:comment] %>'},
 <% end -%>
                     },
                     description: '<%= t(:attributes) %>'
@@ -120,7 +123,7 @@ RSpec.describe '<%= resouces_name %>', type: :request do
                     type: :object,
                     properties: {
 <% attributes.each_key.each do |attr| -%>
-                     <%= attr %>: { type: :<%= columns_with_comment[attr][:type] %>, <%if columns_with_comment[attr][:is_array] -%> items: { type: :<%= columns_with_comment[attr][:items_type] %>},<% end -%> 'x-nullable': <%= columns_with_comment[attr][:nullable] %>, description: '<%= columns_with_comment[attr][:comment] %>'},
+                     <%= attr %>: { type: :<%= columns_with_comment[attr][:type] %>, <%if columns_with_comment[attr][:is_array] -%> items: { type: :<%= columns_with_comment[attr][:items_type] %>},<% end -%>'x-nullable': <%= columns_with_comment[attr][:nullable] %>, description: '<%= columns_with_comment[attr][:comment] %>'},
 <% end -%>
                     },
                     description: '<%= t(:attributes) %>'

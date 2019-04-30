@@ -3,6 +3,7 @@ en:
     page_num: 'Page Number'
     include_related_data: 'Include Related Data'
     display_field: 'Display Field'
+    filter_field: 'Filter Field'
     list: 'List'
     get_list: 'Fetch List'
     detail_link: 'Detail Link'

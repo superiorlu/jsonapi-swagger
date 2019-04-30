@@ -50,6 +50,10 @@ module Jsonapi
       resource_klass._relationships
     end
 
+    def filters
+      resource_klass.filters
+    end
+
     def columns_with_comment
       @columns_with_comment ||= {}.tap do |clos|
         model_klass.columns.each do |col|
@@ -60,6 +64,7 @@ module Jsonapi
 
     def swagger_type(column)
       return 'array' if column.array
+
       case column.type
       when :bigint, :integer then 'integer'
       when :boolean          then 'boolean'
