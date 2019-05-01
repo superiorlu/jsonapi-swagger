@@ -2,7 +2,7 @@
 
 Generate JSONAPI Swagger Doc.
 
-[![Gem Version](https://img.shields.io/gem/v/jsonapi-swagger.svg)](https://rubygems.org/gems/jsonapi-swagger) [![GitHub license](https://img.shields.io/github/license/superiorlu/jsonapi-swagger.svg)](https://github.com/superiorlu/jsonapi-swagger/blob/master/LICENSE.md)
+[![Gem Version](https://img.shields.io/gem/v/jsonapi-swagger.svg)](https://rubygems.org/gems/jsonapi-swagger) [![GitHub license](https://img.shields.io/github/license/superiorlu/jsonapi-swagger.svg)](https://github.com/superiorlu/jsonapi-swagger/blob/master/LICENSE)
 
 ## Installation
 
