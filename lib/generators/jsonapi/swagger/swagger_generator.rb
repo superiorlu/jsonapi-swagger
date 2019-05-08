@@ -58,6 +58,14 @@ module Jsonapi
       resource_klass.sortable_fields
     end
 
+    def creatable_fields
+      resource_klass.creatable_fields - relationships.keys
+    end
+
+    def updatable_fields
+      resource_klass.updatable_fields - relationships.keys
+    end
+
     def filters
       resource_klass.filters
     end
