@@ -12,7 +12,7 @@ RSpec.describe '<%= resouces_name %>', type: :request do
       produces 'application/vnd.api+json'
       parameter name: :'page[number]', in: :query, type: :string, description: '<%= t(:page_num) %>', required: false
 <% if sortable_fields.present? -%>
-      parameter name: :'sort', in: :query, type: :string, description: '<%= sortable_feilds_desc %>', required: false
+      parameter name: :'sort', in: :query, type: :string, description: '<%= sortable_fields_desc %>', required: false
 <% end -%>
 <% if relationships.present? -%>
       parameter name: :include, in: :query, type: :string, description: '<%= t(:include_related_data) %>', required: false
