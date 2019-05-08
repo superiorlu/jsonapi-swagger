@@ -34,6 +34,10 @@ module Jsonapi
       (class_path + [file_name]).map!(&:camelize).join("::")
     end
 
+    def sortable_feilds_desc
+      t(:sortable_fields) + ': [-]' + sortable_fields.join(',')
+    end
+
     def model_klass
       model_class_name.safe_constantize
     end
@@ -48,6 +52,10 @@ module Jsonapi
 
     def relationships
       resource_klass._relationships
+    end
+
+    def sortable_fields
+      resource_klass.sortable_fields
     end
 
     def filters

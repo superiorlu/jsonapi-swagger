@@ -2,6 +2,7 @@ en:
   jsonapi_swagger:
     page_num: 'Page Number'
     include_related_data: 'Include Related Data'
+    sortable_fields: 'Sortable Fields'
     display_field: 'Display Field'
     filter_field: 'Filter Field'
     list: 'List'
