@@ -2,7 +2,8 @@
 
 Generate JSONAPI Swagger Doc.
 
-[![Gem Version](https://img.shields.io/gem/v/jsonapi-swagger.svg)](https://rubygems.org/gems/jsonapi-swagger) [![GitHub license](https://img.shields.io/github/license/superiorlu/jsonapi-swagger.svg)](https://github.com/superiorlu/jsonapi-swagger/blob/master/LICENSE)
+[![Gem Version](https://img.shields.io/gem/v/jsonapi-swagger.svg)](https://rubygems.org/gems/jsonapi-swagger)
+[![GitHub license](https://img.shields.io/github/license/superiorlu/jsonapi-swagger.svg)](https://github.com/superiorlu/jsonapi-swagger/blob/master/LICENSE)
 
 [![jsonapi-swagger-4-2-9.gif](https://i.loli.net/2019/05/05/5ccebf5e782b7.gif)](https://i.loli.net/2019/05/05/5ccebf5e782b7.gif)
 
@@ -28,6 +29,13 @@ Or install it yourself as:
 rails generate jsonapi:swagger User # UserResponse < JSONAPI::Resource
 ```
 
+## RoadMap
+
+- [x] immutable resources
+- [x] filter/sort resources
+- [x] mutable resources
+- [ ] generate swagger.json without rswag
+
 ## Resource
 
 - [JSONAPI](https://jsonapi.org/)
@@ -36,4 +44,5 @@ rails generate jsonapi:swagger User # UserResponse < JSONAPI::Resource
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/superiorlu/jsonapi-swagger.
+Bug reports and pull requests are welcome on GitHub at
+https://github.com/superiorlu/jsonapi-swagger.
