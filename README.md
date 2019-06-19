@@ -40,7 +40,7 @@ end
 
 ```sh
 # gen swagger/v1/swagger.json
-bundle exec rails generate jsonapi:swagger User # UserResponse < JSONAPI::Resource
+bundle exec rails generate jsonapi:swagger User # UserResource < JSONAPI::Resource
 ```
 
 3. additional
