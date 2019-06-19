@@ -3,7 +3,11 @@ RSpec.describe '<%= resouces_name %>', type: :request do
   let(:include) {''} #see https://github.com/domaindrivendev/rswag/issues/188
 
   before(:each) do
+  <% if defined?(FactoryBot) -%>
     @<%= model_name %> = create :<%= model_name %>
+  <% else -%>
+    @<%= model_name %> = <%= model_class_name %>.create
+  <% end -%>
   end
 
   path '/<%= route_resouces %>' do

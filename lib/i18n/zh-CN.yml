@@ -1,6 +1,7 @@
 zh-CN:
   jsonapi_swagger:
     page_num: '页码'
+    page_size: '每页条数'
     include_related_data: '包含关联数据'
     sortable_fields: '排序字段'
     display_field: '显示字段'

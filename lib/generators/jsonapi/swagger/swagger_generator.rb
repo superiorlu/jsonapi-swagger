@@ -4,15 +4,54 @@ module Jsonapi
     source_root File.expand_path('templates', __dir__)
 
     def create_swagger_file
-      swagger_file = File.join(
+      if Jsonapi::Swagger.use_rswag
+        template 'swagger.rb.erb', spec_file
+      else
+        template 'swagger.json.erb', json_file
+      end
+    end
+
+    private
+
+    def doc
+      @doc ||= swagger_json.parse_doc
+    end
+
+    def spec_file
+      @spec_file ||= File.join(
         'spec/requests',
         class_path,
         spec_file_name
       )
-      template 'swagger.rb.erb', swagger_file
     end
 
-    private
+    def json_file
+      @json_file ||= File.join(
+        'swagger',
+        class_path,
+        swagger_file_path
+      )
+    end
+
+    def swagger_version
+      Jsonapi::Swagger.version
+    end
+
+    def swagger_info
+      JSON.pretty_generate(Jsonapi::Swagger.info)
+    end
+
+    def swagger_base_path
+      Jsonapi::Swagger.base_path
+    end
+
+    def swagger_file_path
+      Jsonapi::Swagger.file_path
+    end
+
+    def swagger_json
+      @swagger_json ||= Jsonapi::Swagger::Json.new(json_file)
+    end
 
     def spec_file_name
       "#{file_name.downcase.pluralize}_spec.rb"
@@ -36,6 +75,10 @@ module Jsonapi
 
     def sortable_fields_desc
       t(:sortable_fields) + ': (-)' + sortable_fields.join(',')
+    end
+
+    def ori_sortable_fields_desc
+      tt(:sortable_fields) + ': (-)' + sortable_fields.join(',')
     end
 
     def model_klass
@@ -70,10 +113,11 @@ module Jsonapi
       resource_klass.filters
     end
 
-    def columns_with_comment
+    def columns_with_comment(need_encoding: true)
       @columns_with_comment ||= {}.tap do |clos|
         model_klass.columns.each do |col|
-          clos[col.name.to_sym] = { type: swagger_type(col), items_type: col.type, is_array: col.array,  nullable: col.null, comment: safe_encode(col.comment) }
+          clos[col.name.to_sym] = { type: swagger_type(col), items_type: col.type, is_array: col.array,  nullable: col.null, comment: col.comment }
+          clos[col.name.to_sym][:comment] = safe_encode(col.comment) if need_encoding
         end
       end
     end
@@ -89,10 +133,14 @@ module Jsonapi
     end
 
     def t(key, options={})
+      content = tt(key, options)
+      safe_encode(content)
+    end
+
+    def tt(key, options={})
       options[:scope] = :jsonapi_swagger
       options[:default] = key.to_s.humanize
-      content = I18n.t(key, options)
-      safe_encode(content)
+      I18n.t(key, options)
     end
 
     def safe_encode(content)

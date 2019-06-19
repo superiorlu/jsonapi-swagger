@@ -1,0 +1,319 @@
+{
+  "swagger": "<%= swagger_version %>",
+  "info": <%= swagger_info %>,
+  "basePath" : "<%= swagger_base_path %>",
+  <%-
+    def list_resource_parameters
+      [].tap do |parameters|
+        parameters << { name: 'page[number]', in: :query, type: :string, description: tt(:page_num), required: false }
+        parameters << { name: 'page[size]', in: :query, type: :string, description: tt(:page_size), required: false }
+        if sortable_fields.present?
+          parameters << { name: 'sort', in: :query, type: :string, description: ori_sortable_fields_desc, required: false }
+        end
+        if relationships.present?
+          parameters << { name: :include, in: :query, type: :string, description: tt(:include_related_data), required: false }
+        end
+        filters.each do |filter_attr, filter_config|
+          parameters << { name: :"filter[#{filter_attr}]", in: :query, type: :string, description: tt(:filter_field), required: false}
+        end
+        parameters << { name: :"fields[#{route_resouces}]", in: :query, type: :string, description: tt(:display_field), required: false }
+        relationships.each_value do |relation|
+          parameters << { name: :"fields[#{relation.class_name.tableize}]", in: :query, type: :string, description: tt(:display_field), required: false }
+        end
+      end
+    end
+
+    def show_resource_parameters
+      [].tap do |parameters|
+        parameters << { name: :id, in: :path, type: :integer, description: 'ID', required: true }
+        if relationships.present?
+          parameters << { name: :include, in: :query, type: :string, description: tt(:include_related_data), required: false }
+        end
+        parameters << { name: :"fields[#{route_resouces}]", in: :query, type: :string, description: tt(:display_field), required: false }
+        relationships.each_value do |relation|
+          parameters << { name: :"fields[#{relation.class_name.tableize}]", in: :query, type: :string, description: tt(:display_field), required: false }
+        end
+      end
+    end
+
+    def create_resource_parameters
+      parameters = {
+        name: :data,
+        in: :body,
+        type: :object,
+        properties: {
+          data: {
+            type: :object,
+            properties: {
+              type: { type: :string, default: route_resouces },
+              attributes: {
+                type: :object,
+                properties: properties(attrs: creatable_fields)
+              }
+            }
+          },
+        },
+        description: tt(:request_body)
+     }
+     parameters[:properties][:data][:properties][:relationships] ||= {}
+     parameters[:properties][:data][:properties][:relationships] = { type: :object, properties: create_relationships_properties }
+     parameters
+    end
+
+    def patch_resource_parameters
+      patch_parameters =  create_resource_parameters.dup
+      patch_parameters[:properties][:data][:properties][:id] ||= {}
+      patch_parameters[:properties][:data][:properties][:id].merge!({ type: :integer, description: 'ID' })
+      parameters = [{ name: :id, in: :path, type: :integer, description: 'ID', required: true }]
+      parameters << patch_parameters
+      parameters
+    end
+
+    def delete_resource_parameters
+      [{ name: :id, in: :path, type: :integer, description: 'ID', required: true }]
+    end
+
+    def properties(attrs: [])
+      Hash.new{|h, k| h[k] = {}} .tap do |props|
+        attrs.each do |attr|
+         columns = columns_with_comment(need_encoding: false)
+          props[attr][:type] = columns[attr][:type]
+          props[attr][:items] = { type: columns[attr][:items_type] } if columns[attr][:is_array]
+          props[attr][:'x-nullable'] = columns[attr][:nullable]
+          props[attr][:description] = columns[attr][:comment]
+        end
+      end
+    end
+
+    def relationships_properties
+      {}.tap do |relat_props|
+        relationships.each do |relation_name, relation|
+          relation_name_camelize = relation_name.to_s.camelize
+            relat_props[relation_name] = {
+              type: :object,
+              properties: {
+              links: {
+                type: :object,
+                properties: {
+                  self: { type: :string, description:  tt(:associate_list_link, model: relation_name_camelize) },
+                  related: { type: :string, description: tt(:related_link, model: relation_name_camelize) },
+                },
+                description: tt(:related_link, model: relation_name_camelize)
+              },
+            },
+            description: tt(:related_model, model: relation_name_camelize)
+          }
+        end
+      end
+    end
+
+    def create_relationships_properties
+      {}.tap do |relat_props|
+        relationships.each do |relation_name, relation|
+          relation_name_camelize = relation_name.to_s.camelize
+          relat_props[relation_name] = {
+            type: :object,
+            properties: {
+              data: {
+                type: :array,
+                items: {
+                  type: :object,
+                  properties: {
+                    type: { type: :string, default: relation.table_name },
+                    id: { type: :string, description: "#{relation_name_camelize} ID" },
+                  },
+                },
+                description: tt(:related_ids, model: relation_name_camelize)
+              }
+            },
+            description: tt(:related_ids, model: relation_name_camelize)
+          }
+          if relation.belongs_to?
+            relat_props[relation_name][:properties][:data] = {
+              type: :object,
+              properties: {
+                type: { type: :string, default: relation.table_name },
+                id: { type: :string, description: "#{relation_name_camelize} ID" },
+              },
+              description: tt(:related_id, model: relation_name_camelize)
+            }
+          end
+        end
+      end
+    end
+
+    def list_resource_responses
+      {
+        '200' => {
+          description: tt(:get_list),
+          schema: {
+            type: :object,
+            properties: {
+              data: {
+                type: :array,
+                items: {
+                  type: :object,
+                  properties: {
+                    id: { type: :string, description: 'ID'},
+                    links: {
+                      type: :object,
+                      properties: {
+                      self: { type: :string, description: tt(:detail_link) },
+                    },
+                    description: tt(:detail_link)
+                  },
+                  attributes: {
+                    type: :object,
+                    properties: properties(attrs: attributes.each_key),
+                    description: tt(:attributes)
+                  },
+                  relationships: {
+                    type: :object,
+                    properties: relationships_properties,
+                    description: tt(:associate_data)
+                  }
+              },
+            },
+            description: tt(:data)
+            },
+            meta: {
+              type: :object,
+              properties: {
+                record_count: { type: :integer, description: tt(:record_count)},
+                page_count: { type: :integer, description: tt(:page_count)},
+              },
+              description: tt(:meta)
+            },
+            links: {
+              type: :object,
+              properties: {
+                first: { type: :string, description: tt(:first_page_link) },
+                next: { type: :string, description: tt(:next_page_link) },
+                last: { type: :string, description: tt(:last_page_link) },
+              },
+              description: tt(:page_links) },
+          },
+          required: [:data]
+          }
+        }
+      }
+    end
+
+    def show_resource_responses
+      {
+        '200' => {
+          description: tt(:get_detail),
+          schema: show_resource_schema
+        }
+      }
+    end
+
+    def create_resource_responses
+      {
+        '201' => {
+          description: tt(:create),
+          schema: show_resource_schema
+        }
+      }
+    end
+
+    def delete_resource_responses
+      {
+        '204' => { description: tt(:delete) }
+      }
+    end
+
+    def show_resource_schema
+      {
+        type: :object,
+        properties: {
+          data: {
+            type: :object,
+            properties: {
+              id: { type: :string, description: 'ID'},
+              type: { type: :string, description: 'Type'},
+              links: {
+                type: :object,
+                properties: {
+                  self: { type: :string, description: tt(:detail_link) },
+                },
+                description: tt(:detail_link)
+              },
+              attributes: {
+                type: :object,
+                properties: properties(attrs: attributes.each_key),
+                description: tt(:attributes)
+              },
+              relationships: {
+                type: :object,
+                properties: relationships_properties,
+                description: tt(:associate_data)
+              }
+            },
+            description: tt(:data)
+          }
+        },
+        required: [:data]
+      }
+    end
+
+    doc['paths']["/#{route_resouces}"] = {
+      get: {
+        summary: "#{route_resouces} #{tt(:list)}",
+        tags: [route_resouces],
+        produces: ['application/vnd.api+json'],
+        parameters: list_resource_parameters,
+        responses: list_resource_responses
+      }
+    }
+
+    doc['paths']["/#{route_resouces}/{id}"] = {
+      get: {
+        summary: "#{route_resouces} #{tt(:detail)}",
+        tags: [route_resouces],
+        produces: ['application/vnd.api+json'],
+        parameters: show_resource_parameters,
+        responses: show_resource_responses
+      }
+    }
+
+if resource_klass.mutable?
+  doc['paths']["/#{route_resouces}"].merge!({
+    post: {
+      summary: "#{route_resouces} #{tt(:create)}",
+      tags: [route_resouces],
+      consumes: ['application/vnd.api+json'],
+      produces: ['application/vnd.api+json'],
+      parameters: [create_resource_parameters],
+      responses: create_resource_responses
+    }
+  })
+
+  doc['paths']["/#{route_resouces}/{id}"].merge!({
+    patch: {
+      summary: "#{route_resouces} #{tt(:patch)}",
+      tags: [route_resouces],
+      consumes: ['application/vnd.api+json'],
+      produces: ['application/vnd.api+json'],
+      parameters: patch_resource_parameters,
+      responses: show_resource_responses
+    }
+  })
+
+  doc['paths']["/#{route_resouces}/{id}"].merge!({
+    delete: {
+      summary: "#{route_resouces} #{tt(:delete)}",
+      tags: [route_resouces],
+      produces: ['application/vnd.api+json'],
+      parameters: delete_resource_parameters,
+      responses: delete_resource_responses
+    }
+  })
+else
+  doc['paths']["/#{route_resouces}"].delete(:post)
+  doc['paths']["/#{route_resouces}/{id}"].delete(:patch)
+  doc['paths']["/#{route_resouces}/{id}"].delete(:delete)
+end
+-%>
+  "paths": <%= JSON.pretty_generate(doc['paths'] ) %>
+}

@@ -1,6 +1,7 @@
 en:
   jsonapi_swagger:
     page_num: 'Page Number'
+    page_size: 'Page Size'
     include_related_data: 'Include Related Data'
     sortable_fields: 'Sortable Fields'
     display_field: 'Display Field'
