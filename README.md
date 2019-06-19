@@ -25,8 +25,31 @@ Or install it yourself as:
 
 ## Usage
 
+ 1. config jsonapi swagger
+```rb
+# config/initializers/swagger.rb
+Jsonapi::Swagger.config do |config|
+  config.use_rswag = false
+  config.version = '2.0'
+  config.info = { title: 'API V1', version: 'V1'}
+  config.file_path = 'v1/swagger.json'
+end
+```
+
+2. generate swagger.json
+
 ```sh
-rails generate jsonapi:swagger User # UserResponse < JSONAPI::Resource
+# gen swagger/v1/swagger.json
+bundle exec rails generate jsonapi:swagger User # UserResponse < JSONAPI::Resource
+```
+
+3. additional
+
+ use `rswag`, have to run
+
+```sh
+# gen swagger/v1/swagger.json
+ bundle exec rails rswag:specs:swaggerize
 ```
 
 ## RoadMap
@@ -34,7 +57,7 @@ rails generate jsonapi:swagger User # UserResponse < JSONAPI::Resource
 - [x] immutable resources
 - [x] filter/sort resources
 - [x] mutable resources
-- [ ] generate swagger.json without rswag
+- [x] generate swagger.json without rswag
 
 ## Resource
 
