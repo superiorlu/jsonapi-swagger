@@ -173,7 +173,7 @@ RSpec.describe '<%= resouces_name %>', type: :request do
     end
   end
 
-<% if resource_klass.mutable? -%>
+<% if mutable? -%>
   path '/<%= route_resouces %>' do
     post '<%= route_resouces %> <%= t(:create) %>' do
       tags '<%= route_resouces %>'
@@ -204,7 +204,7 @@ RSpec.describe '<%= resouces_name %>', type: :request do
                         <%= relation_name %>: {
                           type: :object,
                           properties: {
-<% if relation.belongs_to? -%>
+<% if relation.try(:belongs_to?) -%>
                             data: {
                               type: :object,
                               properties: {

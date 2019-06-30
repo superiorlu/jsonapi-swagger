@@ -86,15 +86,15 @@ module Jsonapi
     end
 
     def resource_klass
-      "#{model_class_name}Resource".safe_constantize
+      @resource_klass ||= Jsonapi::Swagger::Resource.with(model_class_name)
     end
 
     def attributes
-      resource_klass._attributes.except(:id)
+      resource_klass.attributes.except(:id)
     end
 
     def relationships
-      resource_klass._relationships
+      resource_klass.relationships
     end
 
     def sortable_fields
@@ -111,6 +111,10 @@ module Jsonapi
 
     def filters
       resource_klass.filters
+    end
+
+    def mutable?
+      resource_klass.mutable?
     end
 
     def columns_with_comment(need_encoding: true)

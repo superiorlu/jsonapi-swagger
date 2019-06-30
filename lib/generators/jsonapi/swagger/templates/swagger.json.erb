@@ -128,7 +128,7 @@
             },
             description: tt(:related_ids, model: relation_name_camelize)
           }
-          if relation.belongs_to?
+          if relation.try(:belongs_to?)
             relat_props[relation_name][:properties][:data] = {
               type: :object,
               properties: {
@@ -277,7 +277,7 @@
       }
     }
 
-if resource_klass.mutable?
+if mutable?
   doc['paths']["/#{route_resouces}"].merge!({
     post: {
       summary: "#{route_resouces} #{tt(:create)}",
