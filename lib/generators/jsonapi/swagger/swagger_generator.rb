@@ -123,6 +123,12 @@ module Jsonapi
           clos[col.name.to_sym] = { type: swagger_type(col), items_type: col.type, is_array: col.array,  nullable: col.null, comment: col.comment }
           clos[col.name.to_sym][:comment] = safe_encode(col.comment) if need_encoding
         end
+        model_klass.translation_class.columns.each do |col|
+          if model_klass.translated_attribute_names.include? col.name.to_sym
+            clos[col.name.to_sym] = { type: swagger_type(col), items_type: col.type, is_array: col.array,  nullable: col.null, comment: col.comment }
+            clos[col.name.to_sym][:comment] = safe_encode(col.comment) if need_encoding
+          end
+        end if model_klass.respond_to? :translation_class
       end
     end
 
