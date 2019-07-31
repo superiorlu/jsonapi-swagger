@@ -77,7 +77,7 @@
       Hash.new{|h, k| h[k] = {}} .tap do |props|
         attribute_props = props.fetch(attr) do
           raise("`#{attr}` type is not found in the database schema. Consider setting `allow_methods_for_attributes` config option to `true`") unless swagger_allow_methods_for_attributes
-          { type: :string, comment: false, read_only: true, nullable: true, })
+          { type: :string, comment: false, read_only: true, nullable: true, }
         end
 
         attrs.each do |attr|
