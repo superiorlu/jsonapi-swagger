@@ -76,7 +76,7 @@
     def properties(attrs: [])
       Hash.new{|h, k| h[k] = {}} .tap do |props|
         attribute_type = props.dig(attr, :type)
-        attribute_type ||= if "<%= swagger_allow_methods_for_attributes %>"
+        attribute_type ||= if <%= swagger_allow_methods_for_attributes %>
            :string
          else
            raise("Type for #{attr} attribute is not found in the database schema. Consider setting `allow_methods_for_attributes` config option to `true`")
