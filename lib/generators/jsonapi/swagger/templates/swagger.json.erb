@@ -75,6 +75,9 @@
 
     def properties(attrs: [])
       Hash.new{|h, k| h[k] = {}} .tap do |props|
+        attribute_type = props.dig(attr, :type)
+        attribute_type ||= "<%= swagger_allow_methods_for_attributes %>" ? :string : raise("Type for #{attr} attribute is not found in the schema. Consider enabling allow_methods_for_attributes=true config option.")
+
         attrs.each do |attr|
          columns = columns_with_comment(need_encoding: false)
           props[attr][:type] = columns[attr][:type]
