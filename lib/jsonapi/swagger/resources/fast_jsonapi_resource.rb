@@ -4,11 +4,11 @@ module Jsonapi
     class FastJsonapiResource
       extend Forwardable
 
-      def_delegators :@jr, :attributes_to_serialize, :relationships_to_serialize, :sortable_fields,
+      def_delegators :@fr, :attributes_to_serialize, :relationships_to_serialize, :sortable_fields,
                            :creatable_fields, :updatable_fields, :filters, :mutable?, :transform_method
 
-      def initialize(jr)
-        @jr = jr
+      def initialize(fr)
+        @fr = fr
       end
 
       alias attributes attributes_to_serialize
