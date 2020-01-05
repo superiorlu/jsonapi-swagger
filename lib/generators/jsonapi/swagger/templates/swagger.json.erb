@@ -18,7 +18,7 @@
         end
         parameters << { name: :"fields[#{route_resouces}]", in: :query, type: :string, description: tt(:display_field), required: false }
         relationships.each_value do |relation|
-          parameters << { name: :"fields[#{relation.class_name.tableize}]", in: :query, type: :string, description: tt(:display_field), required: false }
+          parameters << { name: :"fields[#{relation_table_name(relation)}]", in: :query, type: :string, description: tt(:display_field), required: false }
         end
       end
     end
@@ -31,7 +31,7 @@
         end
         parameters << { name: :"fields[#{route_resouces}]", in: :query, type: :string, description: tt(:display_field), required: false }
         relationships.each_value do |relation|
-          parameters << { name: :"fields[#{relation.class_name.tableize}]", in: :query, type: :string, description: tt(:display_field), required: false }
+          parameters << { name: :"fields[#{relation_table_name(relation)}]", in: :query, type: :string, description: tt(:display_field), required: false }
         end
       end
     end

@@ -117,11 +117,23 @@ module Jsonapi
       resource_klass.mutable?
     end
 
+    def attribute_default
+      Jsonapi::Swagger.attribute_default
+    end
+
+    def transform_method
+      @transform_method ||= resource_klass.transform_method if resource_klass.respond_to?(:transform_method)
+    end
+
     def columns_with_comment(need_encoding: true)
       @columns_with_comment ||= {}.tap do |clos|
+        clos.default_proc = proc do |h, k|
+          h[k] = attribute_default
+        end
         model_klass.columns.each do |col|
-          clos[col.name.to_sym] = { type: swagger_type(col), items_type: col.type, is_array: col.array,  nullable: col.null, comment: col.comment }
-          clos[col.name.to_sym][:comment] = safe_encode(col.comment) if need_encoding
+          col_name = transform_method ? col.name.send(transform_method) : col.name
+          clos[col_name.to_sym] = { type: swagger_type(col), items_type: col.type, is_array: col.array,  nullable: col.null, comment: col.comment }
+          clos[col_name.to_sym][:comment] = safe_encode(col.comment) if need_encoding
         end
       end
     end
@@ -134,6 +146,11 @@ module Jsonapi
       when :boolean          then 'boolean'
       else 'string'
       end
+    end
+
+    def relation_table_name(relation)
+      return relation.class_name.tableize if relation.respond_to?(:class_name)
+      return relation.name if relation.respond_to?(:name)
     end
 
     def t(key, options={})

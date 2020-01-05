@@ -17,6 +17,13 @@ module Jsonapi
           end
           require 'jsonapi/swagger/resources/serializable_resource'
           return Jsonapi::Swagger::SerializableResource.new(@resource_class)
+        elsif Object.const_defined?("#{model_class_name}Serializer")
+          @resource_class = "#{model_class_name}Serializer".safe_constantize
+          unless @resource_class < FastJsonapi::ObjectSerializer
+            raise Jsonapi::Swagger::Error, "#{@resource_class.class} is not Subclass of FastJsonapi::ObjectSerializer!"
+          end
+          require 'jsonapi/swagger/resources/fast_jsonapi_resource'
+          return Jsonapi::Swagger::FastJsonapiResource.new(@resource_class)
         else
           raise Jsonapi::Swagger::Error, "#{model_class_name} not support!"
         end

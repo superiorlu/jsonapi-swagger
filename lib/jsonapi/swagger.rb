@@ -35,6 +35,10 @@ module Jsonapi
       def use_rswag
         @use_rswag ||= false
       end
+
+      def attribute_default
+        @attribute_default ||= { type: :string, nullable: true, comment: nil }
+      end
     end
   end
 end
