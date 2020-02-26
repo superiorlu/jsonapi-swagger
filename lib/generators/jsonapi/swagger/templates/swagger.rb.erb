@@ -14,7 +14,9 @@ RSpec.describe '<%= resouces_name %>', type: :request do
     get '<%= route_resouces %> <%= t(:list) %>' do
       tags '<%= route_resouces %>'
       produces 'application/vnd.api+json'
+<% if paginator == :paged %>
       parameter name: :'page[number]', in: :query, type: :string, description: '<%= t(:page_num) %>', required: false
+<% end %>
 <% if sortable_fields.present? -%>
       parameter name: :'sort', in: :query, type: :string, description: '<%= sortable_fields_desc %>', required: false
 <% end -%>
@@ -80,6 +82,7 @@ RSpec.describe '<%= resouces_name %>', type: :request do
             },
             description: '<%= t(:data) %>'
             },
+<% unless paginator == :none %>
             meta: {
               type: :object,
               properties: {
@@ -95,7 +98,9 @@ RSpec.describe '<%= resouces_name %>', type: :request do
                 next: { type: :string, description: '<%= t(:next_page_link) %>'},
                 last: { type: :string, description: '<%= t(:last_page_link) %>'},
               },
-              description: '<%= t(:page_links) %>' },
+              description: '<%= t(:page_links) %>'
+            },
+<% end %>
           },
           required: [:data]
         run_test!
