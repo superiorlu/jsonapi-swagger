@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
   spec.licenses      = ['MIT']
 
   spec.add_development_dependency 'bundler', '~> 2.0'
-  spec.add_development_dependency 'rake', '~> 10.0'
+  spec.add_development_dependency 'rake', '>= 12.3.3'
   spec.add_development_dependency 'rubocop', '~> 0.67'
   spec.add_development_dependency 'rswag', '~>2.0'
 end
