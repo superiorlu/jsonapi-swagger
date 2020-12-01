@@ -117,6 +117,10 @@ module Jsonapi
       resource_klass.mutable?
     end
 
+    def paginator
+      resource_klass.paginator
+    end
+
     def attribute_default
       Jsonapi::Swagger.attribute_default
     end
