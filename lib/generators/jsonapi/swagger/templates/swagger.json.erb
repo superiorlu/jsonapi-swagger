@@ -76,11 +76,17 @@
     def properties(attrs: [])
       Hash.new{|h, k| h[k] = {}} .tap do |props|
         attrs.each do |attr|
-         columns = columns_with_comment(need_encoding: false)
-          props[attr][:type] = columns[attr][:type]
-          props[attr][:items] = { type: columns[attr][:items_type] } if columns[attr][:is_array]
-          props[attr][:'x-nullable'] = columns[attr][:nullable]
-          props[attr][:description] = columns[attr][:comment]
+          columns = columns_with_comment(need_encoding: false)
+          attribute_props = columns.fetch(attr) do
+            raise("`#{attr}` type is not found in the database schema. Consider setting `allow_methods_for_attributes` config option to `true`") unless swagger_allow_methods_for_attributes
+            { type: :string, comment: nil, read_only: true, nullable: true, }
+          end
+
+          props[attr][:type] = attribute_props[:type]
+          props[attr][:items] = { type: attribute_props[:items_type] } if attribute_props[:is_array]
+          props[attr][:'x-nullable'] = attribute_props[:nullable]
+          props[attr][:description] = attribute_props[:comment]
+          props[attr][:readOnly] = true if attribute_props[:read_only]
         end
       end
     end

@@ -33,6 +33,10 @@ module Jsonapi
       )
     end
 
+    def swagger_allow_methods_for_attributes
+      Jsonapi::Swagger.allow_methods_for_attributes
+    end
+
     def swagger_version
       Jsonapi::Swagger.version
     end
