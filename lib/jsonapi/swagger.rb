@@ -10,7 +10,7 @@ module Jsonapi
     class Error < StandardError; end
 
     class << self
-      attr_accessor :version, :info, :file_path, :base_path, :use_rswag
+      attr_accessor :version, :info, :file_path, :base_path, :use_rswag, :host
 
       def config
         yield self
@@ -30,6 +30,10 @@ module Jsonapi
 
       def base_path
         @base_path
+      end
+
+      def host
+        @host
       end
 
       def use_rswag

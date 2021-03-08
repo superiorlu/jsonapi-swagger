@@ -45,6 +45,10 @@ module Jsonapi
       Jsonapi::Swagger.base_path
     end
 
+    def swagger_host
+      Jsonapi::Swagger.host
+    end
+
     def swagger_file_path
       Jsonapi::Swagger.file_path
     end
