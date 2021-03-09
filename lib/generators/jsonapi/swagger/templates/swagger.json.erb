@@ -23,6 +23,9 @@
         relationships.each_value do |relation|
           parameters << { name: :"fields[#{relation_table_name(relation)}]", in: :query, type: :string, description: tt(:display_field), required: false }
         end
+        if extra_parameters
+          parameters = parameters.concat(extra_parameters)
+        end
       end
     end
 
@@ -36,6 +39,9 @@
         relationships.each_value do |relation|
           parameters << { name: :"fields[#{relation_table_name(relation)}]", in: :query, type: :string, description: tt(:display_field), required: false }
         end
+        if extra_parameters
+          parameters = parameters.concat(extra_parameters)
+        end        
       end
     end
 
@@ -70,11 +76,18 @@
       patch_parameters[:schema][:properties][:data][:properties][:id].merge!({ type: :integer, description: 'ID' })
       parameters = [{ name: :id, in: :path, type: :integer, description: 'ID', required: true }]
       parameters << patch_parameters
+      if extra_parameters
+        parameters = parameters.concat(extra_parameters)
+      end      
       parameters
     end
 
     def delete_resource_parameters
-      [{ name: :id, in: :path, type: :integer, description: 'ID', required: true }]
+      parameters = [{ name: :id, in: :path, type: :integer, description: 'ID', required: true }]
+      if extra_parameters
+        parameters = parameters.concat(extra_parameters)
+      end
+      parameters      
     end
 
     def properties(attrs: [])

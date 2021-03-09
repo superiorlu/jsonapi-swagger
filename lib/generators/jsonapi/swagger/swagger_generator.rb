@@ -117,6 +117,11 @@ module Jsonapi
       resource_klass.filters
     end
 
+    # Static parameters that will be added to all end points for the class
+    def extra_parameters
+      resource_klass.extra_parameters
+    end
+
     def mutable?
       resource_klass.mutable?
     end
