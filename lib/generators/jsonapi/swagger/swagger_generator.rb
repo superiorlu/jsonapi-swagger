@@ -45,6 +45,10 @@ module Jsonapi
       Jsonapi::Swagger.base_path
     end
 
+    def swagger_host
+      Jsonapi::Swagger.host
+    end
+
     def swagger_file_path
       Jsonapi::Swagger.file_path
     end
@@ -111,6 +115,11 @@ module Jsonapi
 
     def filters
       resource_klass.filters
+    end
+
+    # Static parameters that will be added to all end points for the class
+    def extra_parameters
+      resource_klass.extra_parameters
     end
 
     def mutable?

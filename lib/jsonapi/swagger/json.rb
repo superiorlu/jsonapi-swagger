@@ -16,6 +16,10 @@ module Jsonapi
         Jsonapi::Swagger.base_path
       end
 
+      def host
+        Jsonapi::Swagger.host
+      end
+
       def load
         @data ||= if File.exist?(path)
                   IO.read(path)
