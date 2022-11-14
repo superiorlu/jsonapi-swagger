@@ -40,30 +40,27 @@
       parameters = {
         name: :data,
         in: :body,
-        type: :object,
-        properties: {
-          data: {
-            type: :object,
-            properties: {
-              type: { type: :string, default: route_resouces },
-              attributes: {
-                type: :object,
-                properties: properties(attrs: creatable_fields)
-              }
+        schema: {
+          type: :object,
+          properties: {
+            type: { type: :string, default: route_resouces },
+            attributes: {
+              type: :object,
+              properties: properties(attrs: creatable_fields)
             }
-          },
+          }
         },
         description: tt(:request_body)
      }
-     parameters[:properties][:data][:properties][:relationships] ||= {}
-     parameters[:properties][:data][:properties][:relationships] = { type: :object, properties: create_relationships_properties }
+     parameters[:schema][:properties][:relationships] ||= {}
+     parameters[:schema][:properties][:relationships] = { type: :object, properties: create_relationships_properties }
      parameters
     end
 
     def patch_resource_parameters
       patch_parameters =  create_resource_parameters.dup
-      patch_parameters[:properties][:data][:properties][:id] ||= {}
-      patch_parameters[:properties][:data][:properties][:id].merge!({ type: :integer, description: 'ID' })
+      patch_parameters[:schema][:properties][:id] ||= {}
+      patch_parameters[:schema][:properties][:id].merge!({ type: :integer, description: 'ID' })
       parameters = [{ name: :id, in: :path, type: :integer, description: 'ID', required: true }]
       parameters << patch_parameters
       parameters
@@ -80,7 +77,7 @@
           props[attr][:type] = columns[attr][:type]
           props[attr][:items] = { type: columns[attr][:items_type] } if columns[attr][:is_array]
           props[attr][:'x-nullable'] = columns[attr][:nullable]
-          props[attr][:description] = columns[attr][:comment]
+          props[attr][:description] = columns[attr][:comment] || ''
         end
       end
     end
