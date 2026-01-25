@@ -61,12 +61,12 @@ module Jsonapi
       file_name.downcase.singularize
     end
 
-    def resouces_name
+    def resources_name
       model_class_name.pluralize
     end
 
-    def route_resouces
-      resouces_name.tableize
+    def route_resources
+      resources_name.tableize
     end
 
     def model_class_name
@@ -82,7 +82,7 @@ module Jsonapi
     end
 
     def model_klass
-      file_name.camelize.safe_constantize
+      model_class_name.safe_constantize
     end
 
     def resource_klass
