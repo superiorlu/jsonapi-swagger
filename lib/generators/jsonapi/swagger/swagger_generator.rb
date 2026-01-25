@@ -154,15 +154,15 @@ module Jsonapi
       return relation.name if relation.respond_to?(:name)
     end
 
-    def t(key, options={})
-      content = tt(key, options)
+    def t(key, **options)
+      content = tt(key, **options)
       safe_encode(content)
     end
 
-    def tt(key, options={})
+    def tt(key, **options)
       options[:scope] = :jsonapi_swagger
       options[:default] = key.to_s.humanize
-      I18n.t(key, options)
+      I18n.t(key, **options)
     end
 
     def safe_encode(content)
