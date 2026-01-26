@@ -12,14 +12,16 @@ module Jsonapi
         @doc ||= begin
           parsed = JSON.parse(load)
 
-          Hash.new { |h, k| h[k] = {} }.tap do |doc|
-            doc.merge!(parsed.is_a?(Hash) ? parsed : {})
-            doc['paths'] = {} unless doc['paths'].is_a?(Hash)
-          end
-        rescue StandardError
-          Hash.new { |h, k| h[k] = {} }.tap do |doc|
+          doc = Hash.new { |h, k| h[k] = {} }
+          doc.merge!(parsed) if parsed.is_a?(Hash)
+
+          if doc.key?('paths') && !doc['paths'].is_a?(Hash)
             doc['paths'] = {}
           end
+
+          doc
+        rescue StandardError
+          Hash.new { |h, k| h[k] = {} }
         end
       end
 
