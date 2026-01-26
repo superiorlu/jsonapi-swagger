@@ -2,6 +2,7 @@
 
 require 'json'
 
+require 'logger'
 require 'active_support'
 require 'active_support/core_ext/hash/except'
 require 'active_support/core_ext/object/blank'
