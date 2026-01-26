@@ -14,13 +14,33 @@ RSpec.describe Jsonapi::Swagger::Resource do
 
   it 'wraps JSONAPI::Resource subclasses' do
     klass = Class.new(JSONAPI::Resource) do
-      def self._attributes = { id: {}, name: {} }
-      def self._relationships = {}
-      def self.sortable_fields = []
-      def self.creatable_fields = []
-      def self.updatable_fields = []
-      def self.filters = {}
-      def self.mutable? = false
+      def self._attributes
+        { id: {}, name: {} }
+      end
+
+      def self._relationships
+        {}
+      end
+
+      def self.sortable_fields
+        []
+      end
+
+      def self.creatable_fields
+        []
+      end
+
+      def self.updatable_fields
+        []
+      end
+
+      def self.filters
+        {}
+      end
+
+      def self.mutable?
+        false
+      end
     end
     stub_const('UserResource', klass)
 
@@ -31,10 +51,21 @@ RSpec.describe Jsonapi::Swagger::Resource do
 
   it 'wraps JSONAPI::Serializable::Resource subclasses' do
     klass = Class.new(JSONAPI::Serializable::Resource) do
-      def self.type_val = :users
-      def self.attribute_blocks = { id: nil, name: nil }
-      def self.relationship_blocks = { company: nil }
-      def self.link_blocks = {}
+      def self.type_val
+        :users
+      end
+
+      def self.attribute_blocks
+        { id: nil, name: nil }
+      end
+
+      def self.relationship_blocks
+        { company: nil }
+      end
+
+      def self.link_blocks
+        {}
+      end
     end
     stub_const('SerializableUser', klass)
 
@@ -46,8 +77,13 @@ RSpec.describe Jsonapi::Swagger::Resource do
 
   it 'wraps FastJsonapi::ObjectSerializer subclasses' do
     klass = Class.new(FastJsonapi::ObjectSerializer) do
-      def self.attributes_to_serialize = { id: {}, name: {} }
-      def self.relationships_to_serialize = {}
+      def self.attributes_to_serialize
+        { id: {}, name: {} }
+      end
+
+      def self.relationships_to_serialize
+        {}
+      end
     end
     stub_const('UserSerializer', klass)
 

@@ -13,7 +13,9 @@ module Rails
       class << self
         attr_accessor :_source_root, :_destination_root
 
-        def desc(*) = nil
+        def desc(*)
+          nil
+        end
 
         def source_root(path = nil)
           self._source_root = path if path
@@ -77,13 +79,33 @@ RSpec.describe Jsonapi::SwaggerGenerator do
     relation.define_singleton_method(:belongs_to?) { true }
 
     resource = Class.new(JSONAPI::Resource) do
-      def self._attributes = { id: nil, name: nil }
-      def self._relationships = { company: OpenStruct.new(class_name: 'Company', table_name: 'companies') }
-      def self.sortable_fields = [:name]
-      def self.creatable_fields = [:name]
-      def self.updatable_fields = [:name]
-      def self.filters = { name: {} }
-      def self.mutable? = true
+      def self._attributes
+        { id: nil, name: nil }
+      end
+
+      def self._relationships
+        { company: OpenStruct.new(class_name: 'Company', table_name: 'companies') }
+      end
+
+      def self.sortable_fields
+        [:name]
+      end
+
+      def self.creatable_fields
+        [:name]
+      end
+
+      def self.updatable_fields
+        [:name]
+      end
+
+      def self.filters
+        { name: {} }
+      end
+
+      def self.mutable?
+        true
+      end
     end
 
     # Ensure relationship object has belongs_to? and table_name.
