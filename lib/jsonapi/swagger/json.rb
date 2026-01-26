@@ -9,7 +9,18 @@ module Jsonapi
       end
 
       def parse_doc
-        @doc ||= JSON.parse(load) rescue Hash.new{ |h, k| h[k]= {} }
+        @doc ||= begin
+          parsed = JSON.parse(load)
+
+          Hash.new { |h, k| h[k] = {} }.tap do |doc|
+            doc.merge!(parsed.is_a?(Hash) ? parsed : {})
+            doc['paths'] = {} unless doc['paths'].is_a?(Hash)
+          end
+        rescue StandardError
+          Hash.new { |h, k| h[k] = {} }.tap do |doc|
+            doc['paths'] = {}
+          end
+        end
       end
 
       def base_path
