@@ -16,7 +16,7 @@
         filters.each do |filter_attr, filter_config|
           parameters << { name: :"filter[#{filter_attr}]", in: :query, type: :string, description: tt(:filter_field), required: false}
         end
-        parameters << { name: :"fields[#{route_resouces}]", in: :query, type: :string, description: tt(:display_field), required: false }
+        parameters << { name: :"fields[#{route_resources}]", in: :query, type: :string, description: tt(:display_field), required: false }
         relationships.each_value do |relation|
           parameters << { name: :"fields[#{relation_table_name(relation)}]", in: :query, type: :string, description: tt(:display_field), required: false }
         end
@@ -29,7 +29,7 @@
         if relationships.present?
           parameters << { name: :include, in: :query, type: :string, description: tt(:include_related_data), required: false }
         end
-        parameters << { name: :"fields[#{route_resouces}]", in: :query, type: :string, description: tt(:display_field), required: false }
+        parameters << { name: :"fields[#{route_resources}]", in: :query, type: :string, description: tt(:display_field), required: false }
         relationships.each_value do |relation|
           parameters << { name: :"fields[#{relation_table_name(relation)}]", in: :query, type: :string, description: tt(:display_field), required: false }
         end
@@ -45,7 +45,7 @@
           data: {
             type: :object,
             properties: {
-              type: { type: :string, default: route_resouces },
+              type: { type: :string, default: route_resources },
               attributes: {
                 type: :object,
                 properties: properties(attrs: creatable_fields)
@@ -257,20 +257,20 @@
       }
     end
 
-    doc['paths']["/#{route_resouces}"] = {
+    doc['paths']["/#{route_resources}"] = {
       get: {
-        summary: "#{route_resouces} #{tt(:list)}",
-        tags: [route_resouces],
+        summary: "#{route_resources} #{tt(:list)}",
+        tags: [route_resources],
         produces: ['application/vnd.api+json'],
         parameters: list_resource_parameters,
         responses: list_resource_responses
       }
     }
 
-    doc['paths']["/#{route_resouces}/{id}"] = {
+    doc['paths']["/#{route_resources}/{id}"] = {
       get: {
-        summary: "#{route_resouces} #{tt(:detail)}",
-        tags: [route_resouces],
+        summary: "#{route_resources} #{tt(:detail)}",
+        tags: [route_resources],
         produces: ['application/vnd.api+json'],
         parameters: show_resource_parameters,
         responses: show_resource_responses
@@ -278,10 +278,10 @@
     }
 
 if mutable?
-  doc['paths']["/#{route_resouces}"].merge!({
+  doc['paths']["/#{route_resources}"].merge!({
     post: {
-      summary: "#{route_resouces} #{tt(:create)}",
-      tags: [route_resouces],
+      summary: "#{route_resources} #{tt(:create)}",
+      tags: [route_resources],
       consumes: ['application/vnd.api+json'],
       produces: ['application/vnd.api+json'],
       parameters: [create_resource_parameters],
@@ -289,10 +289,10 @@ if mutable?
     }
   })
 
-  doc['paths']["/#{route_resouces}/{id}"].merge!({
+  doc['paths']["/#{route_resources}/{id}"].merge!({
     patch: {
-      summary: "#{route_resouces} #{tt(:patch)}",
-      tags: [route_resouces],
+      summary: "#{route_resources} #{tt(:patch)}",
+      tags: [route_resources],
       consumes: ['application/vnd.api+json'],
       produces: ['application/vnd.api+json'],
       parameters: patch_resource_parameters,
@@ -300,19 +300,19 @@ if mutable?
     }
   })
 
-  doc['paths']["/#{route_resouces}/{id}"].merge!({
+  doc['paths']["/#{route_resources}/{id}"].merge!({
     delete: {
-      summary: "#{route_resouces} #{tt(:delete)}",
-      tags: [route_resouces],
+      summary: "#{route_resources} #{tt(:delete)}",
+      tags: [route_resources],
       produces: ['application/vnd.api+json'],
       parameters: delete_resource_parameters,
       responses: delete_resource_responses
     }
   })
 else
-  doc['paths']["/#{route_resouces}"].delete(:post)
-  doc['paths']["/#{route_resouces}/{id}"].delete(:patch)
-  doc['paths']["/#{route_resouces}/{id}"].delete(:delete)
+  doc['paths']["/#{route_resources}"].delete(:post)
+  doc['paths']["/#{route_resources}/{id}"].delete(:patch)
+  doc['paths']["/#{route_resources}/{id}"].delete(:delete)
 end
 -%>
   "paths": <%= JSON.pretty_generate(doc['paths'] ) %>
