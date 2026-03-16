@@ -5,8 +5,10 @@
   <%-
     def list_resource_parameters
       [].tap do |parameters|
-        parameters << { name: 'page[number]', in: :query, type: :string, description: tt(:page_num), required: false }
-        parameters << { name: 'page[size]', in: :query, type: :string, description: tt(:page_size), required: false }
+        if paginator == :paged
+          parameters << { name: 'page[number]', in: :query, type: :string, description: tt(:page_num), required: false }
+          parameters << { name: 'page[size]', in: :query, type: :string, description: tt(:page_size), required: false }
+        end
         if sortable_fields.present?
           parameters << { name: 'sort', in: :query, type: :string, description: ori_sortable_fields_desc, required: false }
         end
@@ -143,57 +145,63 @@
     end
 
     def list_resource_responses
+      response_properties = {
+        data: {
+          type: :array,
+          items: {
+            type: :object,
+            properties: {
+              id: { type: :string, description: 'ID' },
+              links: {
+                type: :object,
+                properties: {
+                  self: { type: :string, description: tt(:detail_link) },
+                },
+                description: tt(:detail_link)
+              },
+              attributes: {
+                type: :object,
+                properties: properties(attrs: attributes.each_key),
+                description: tt(:attributes)
+              },
+              relationships: {
+                type: :object,
+                properties: relationships_properties,
+                description: tt(:associate_data)
+              }
+            },
+          },
+          description: tt(:data)
+        }
+      }
+
+      unless paginator == :none
+        response_properties[:meta] = {
+          type: :object,
+          properties: {
+            record_count: { type: :integer, description: tt(:record_count)},
+            page_count: { type: :integer, description: tt(:page_count)},
+          },
+          description: tt(:meta)
+        }
+        response_properties[:links] = {
+          type: :object,
+          properties: {
+            first: { type: :string, description: tt(:first_page_link) },
+            next: { type: :string, description: tt(:next_page_link) },
+            last: { type: :string, description: tt(:last_page_link) },
+          },
+          description: tt(:page_links)
+        }
+      end
+
       {
         '200' => {
           description: tt(:get_list),
           schema: {
             type: :object,
-            properties: {
-              data: {
-                type: :array,
-                items: {
-                  type: :object,
-                  properties: {
-                    id: { type: :string, description: 'ID'},
-                    links: {
-                      type: :object,
-                      properties: {
-                      self: { type: :string, description: tt(:detail_link) },
-                    },
-                    description: tt(:detail_link)
-                  },
-                  attributes: {
-                    type: :object,
-                    properties: properties(attrs: attributes.each_key),
-                    description: tt(:attributes)
-                  },
-                  relationships: {
-                    type: :object,
-                    properties: relationships_properties,
-                    description: tt(:associate_data)
-                  }
-              },
-            },
-            description: tt(:data)
-            },
-            meta: {
-              type: :object,
-              properties: {
-                record_count: { type: :integer, description: tt(:record_count)},
-                page_count: { type: :integer, description: tt(:page_count)},
-              },
-              description: tt(:meta)
-            },
-            links: {
-              type: :object,
-              properties: {
-                first: { type: :string, description: tt(:first_page_link) },
-                next: { type: :string, description: tt(:next_page_link) },
-                last: { type: :string, description: tt(:last_page_link) },
-              },
-              description: tt(:page_links) },
-          },
-          required: [:data]
+            properties: response_properties,
+            required: [:data]
           }
         }
       }

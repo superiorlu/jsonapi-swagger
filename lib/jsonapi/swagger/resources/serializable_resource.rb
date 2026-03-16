@@ -40,6 +40,10 @@ module Jsonapi
       def mutable?
         false
       end
+
+      def paginator
+        :paged
+      end
     end
   end
 end
