@@ -10,7 +10,11 @@ module Jsonapi
     class Error < StandardError; end
 
     class << self
-      attr_accessor :version, :info, :file_path, :base_path, :use_rswag
+      attr_accessor :allow_methods_for_attributes, :version, :info, :file_path, :base_path, :use_rswag
+
+      def allow_methods_for_attributes
+        @allow_methods_for_attributes ||= true
+      end
 
       def config
         yield self
